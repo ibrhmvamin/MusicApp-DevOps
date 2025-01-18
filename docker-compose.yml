@@ -1,0 +1,101 @@
+
+services:
+  # redis
+  redis:
+    image: redis
+    container_name: redis-server
+    ports:
+      - "6379:6379"
+    networks:
+      - home
+  
+  # rabbitmq
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq_container
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    networks:
+      - home
+  
+
+  # apigateway
+  apigateway:
+    build:
+      context: .
+      dockerfile: DevOpsExmaProject.ApiGateway/Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    depends_on:
+        - identityapi
+        - mp3api
+    networks:
+      - home
+
+  # identityapi
+  identityapi:
+    build:
+      context: .
+      dockerfile: DevOpsExmaProject.Identity/Dockerfile
+    ports:
+      - "8444:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+      - home
+
+
+   # mp3api
+  mp3api:
+    build:
+      context: .
+      dockerfile: DevOpsExmaProject.Mp3WebApi/Dockerfile
+    ports:
+      - "8445:8080"
+    volumes:
+      - devopsexmaproject_image_volume:/app/images
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    networks:
+     - home
+
+
+  reactui:
+    build:
+      context: ./devopsexmaproject.ui
+      dockerfile: Dockerfile
+    container_name: devopsexmaproject.ui
+    ports:
+      - "5173:5173" 
+    volumes:
+      - devopsexmaproject_image_volume:/app/images
+      - ./devopsexmaproject.ui:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+    stdin_open: true
+    tty: true
+    networks:
+      - home
+
+# volumes
+volumes:
+  devopsexmaproject_image_volume:
+    driver: local
+
+
+# networks
+networks:
+  home:
+    driver: bridge
+
+
+  
+
