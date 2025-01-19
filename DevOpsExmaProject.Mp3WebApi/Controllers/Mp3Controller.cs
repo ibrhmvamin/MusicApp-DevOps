@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DevOpsExmaProject.Mp3WebApi.Controllers
 {
     [Route("Mp3")]
-    [Authorize]
+    //[Authorize]
     [ApiController]
     public class Mp3Controller : ControllerBase
     {

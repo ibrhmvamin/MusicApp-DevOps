@@ -7,7 +7,6 @@ using DevOpsExmaProject.Mp3WebApi.Services.Concretes;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using System.Text;
@@ -19,9 +18,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// DbContext Configuration - PostgreSQL i?in yap?land?rma
+// DbContext Configuration
 builder.Services.AddDbContext<Mp3DbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Identity Configuration
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -71,28 +70,28 @@ builder.Services.AddScoped<IFileService, FileService>();
 // Redis Configuration
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var configuration = ConfigurationOptions.Parse("redis:6379", true);
-    configuration.AbortOnConnectFail = true;
+    var configuration = ConfigurationOptions.Parse("redis-11025.c8.us-east-1-2.ec2.redns.redis-cloud.com:11025,abortConnect=false");
+    configuration.Password = "WROUhzcuPDao8OEB01IIkNWnLeFdXLUS";
+    configuration.AbortOnConnectFail = false;
     return ConnectionMultiplexer.Connect(configuration);
 });
+
 
 var app = builder.Build();
 
 // Swagger Configuration (Enabled in Development)
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // Middleware Configuration
-//app.UseHttpsRedirection();
-
+// Uncomment in production
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-
 
 app.MapControllers();
 

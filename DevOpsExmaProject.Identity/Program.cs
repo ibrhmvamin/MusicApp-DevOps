@@ -14,13 +14,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
+
 
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowSpecificOrigin", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader();
     });
@@ -30,7 +32,7 @@ builder.Services.AddCors(options =>
 
 // DbContext Configuration with PostgreSQL
 builder.Services.AddDbContext<Mp3DbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Identity Configuration
 builder.Services.AddIdentity<User, IdentityRole>(options =>
@@ -69,6 +71,12 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ISMTPService, SMTPService>();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 
 // Middleware
 app.UseCors("AllowSpecificOrigin");

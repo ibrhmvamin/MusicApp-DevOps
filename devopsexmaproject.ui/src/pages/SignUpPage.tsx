@@ -3,70 +3,27 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const SignUpPage = () => {
+  // State variables
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
-  const [confirmEmail, setConfirmEmail] = useState<boolean>(false);
-
   const [userName, setUserName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
-  const [emailVerifictionCode, setEmailVerificationCode] = useState<string>("");
-
-  const [verificationCode, setVerificationCode] = useState<string>("");
-
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // Navigator
   const navigate = useNavigate();
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
+  // Toggle password visibility
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  const toggleConfirmPasswordVisibility = () =>
     setShowConfirmPassword(!showConfirmPassword);
-  };
 
+  // Validation function
   const signUpValidateFunction = async (): Promise<boolean> => {
-    if (password != confirmPassword) {
-      setErrorMessage("password və confirmPassword eyni olmalidilar!!!");
-      return false;
-    }
-
-    if (confirmEmail) {
-      if (emailVerifictionCode != verificationCode) {
-        setErrorMessage("Email 6 Nomrəli Doğrulama Codu Səfdir!!!");
-        return false;
-      }
-    } else {
-      interface CheckEmailResponse {
-        isAvailable: boolean;
-      }
-
-      try {
-        const responseEmail = await axios.get<CheckEmailResponse>(
-          `http://localhost:5001/auth/checkemail`,
-          {
-            params: { email: email },
-          }
-        );
-
-        if (responseEmail.data?.isAvailable === false) {
-          setErrorMessage("Bu Email əvəlcə istifaidə olunub!!!");
-          return false;
-        }
-
-        setErrorMessage("");
-        return true;
-      } catch (error) {
-        console.error("Error during email validation", error);
-        return false;
-      }
-    }
-
-    if (!userNameValidateFunction()) {
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match!");
       return false;
     }
 
@@ -74,154 +31,138 @@ const SignUpPage = () => {
     return true;
   };
 
-  const userNameValidateFunction = (): boolean => {
-    if (!userName.includes("_")) {
-      setErrorMessage("UserName mütləq ən azi 1 _ simvolu olmalidi olmalidi");
-      return false;
-    }
-
-    if (!/\d/.test(userName)) {
-      setErrorMessage(
-        "UserName mütləq ən azi 1 (1234567890) Rəqəm simvolu olmalidi olmalidi"
-      );
-      return false;
-    }
-
-    if (userName.length < 8) {
-      setErrorMessage("UserName mütləq 8 simvol və ay cox olmalidi");
-      return false;
-    }
-
-    if (!/^[a-zA-Z0-9_]+$/.test(userName)) {
-      setErrorMessage(
-        "UserName-də ancaq rəqəm,(english (abc)) hərf və _ istifadə edə bilərsiz"
-      );
-      return false;
-    }
-
-    return true;
-  };
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!(await signUpValidateFunction())) {
-      return;
-    }
+    if (!(await signUpValidateFunction())) return;
 
-    if (!confirmEmail) {
-      const UserNameInput = document.getElementById(
-        "userName"
-      ) as HTMLInputElement | null;
-      const EmailInput = document.getElementById(
-        "Email"
-      ) as HTMLInputElement | null;
-      const PasswordInput = document.getElementById(
-        "password"
-      ) as HTMLInputElement | null;
-      const ConfirmInput = document.getElementById(
-        "confirmPassword"
-      ) as HTMLInputElement | null;
+    try {
+      const dto = {
+        userName,
+        email,
+        password,
+      };
 
-      const inputs = [UserNameInput, EmailInput, PasswordInput, ConfirmInput];
-
-      inputs.forEach((input) => {
-        if (input) {
-          input.readOnly = true;
-        }
+      await axios.post(`http://localhost:5001/auth/signup`, dto, {
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
 
-      try {
-        const dto = {
-          Email: email,
-        };
-        const responseSMTP = await axios.post(
-          `http://localhost:5001/auth/checksmtp`,
-          dto,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const encryptionRandomNumber = responseSMTP.data;
-        setVerificationCode(String(encryptionRandomNumber - 121212));
-        setConfirmEmail(true);
-      } catch (error) {
-        console.error("Error during SMTP check", error);
-        alert("SMTP check failed!");
-      }
-    } else {
-      try {
-        const dto = {
-          UserName: userName,
-          Email: email,
-          Password: password,
-        };
-        await axios.post(`http://localhost:5001/auth/signup`, dto, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        console.log("Ok Sign Up Successful");
-        navigate("/SignIn");
-      } catch (error) {
-        console.error("Error during check", error);
-      }
+      navigate("/SignIn");
+    } catch (error) {
+      console.error("Error during sign up", error);
+      setErrorMessage("Failed to sign up. Please try again.");
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card p-4 shadow" style={{ width: "400px" }}>
-        <h3 className="text-center mb-4">Sign Up</h3>
+    <div
+      className="d-flex justify-content-center align-items-center vh-100"
+      style={{
+        backgroundColor: "#121212",
+        color: "white",
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
+      <div
+        className="card p-4"
+        style={{
+          width: "400px",
+          borderRadius: "12px",
+          background: "#181818",
+          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.5)",
+          color: "white",
+        }}
+      >
+        <h3
+          className="text-center mb-4"
+          style={{ fontWeight: "bold", color: "#1db954" }}
+        >
+          Sign Up
+        </h3>
         <form onSubmit={handleSubmit}>
+          {/* Username */}
           <div className="mb-3">
-            <label htmlFor="userName" className="form-label">
+            <label
+              htmlFor="userName"
+              className="form-label"
+              style={{ color: "#b3b3b3" }}
+            >
               Username
             </label>
             <input
-              name="userName"
               id="userName"
               placeholder="Enter Username"
               type="text"
               className="form-control"
               required
               value={userName}
+              style={{
+                borderRadius: "8px",
+                border: "none",
+                padding: "10px",
+                backgroundColor: "#282828",
+                color: "white",
+              }}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setUserName(e.target.value)
               }
             />
           </div>
+
+          {/* Email */}
           <div className="mb-3">
-            <label htmlFor="Email" className="form-label">
+            <label
+              htmlFor="email"
+              className="form-label"
+              style={{ color: "#b3b3b3" }}
+            >
               Email
             </label>
             <input
-              name="Email"
-              id="Email"
+              id="email"
               placeholder="Enter Email"
               type="email"
               className="form-control"
               required
               value={email}
+              style={{
+                borderRadius: "8px",
+                border: "none",
+                padding: "10px",
+                backgroundColor: "#282828",
+                color: "white",
+              }}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setEmail(e.target.value)
               }
             />
           </div>
+
+          {/* Password */}
           <div className="mb-3 position-relative">
-            <label htmlFor="password" className="form-label">
+            <label
+              htmlFor="password"
+              className="form-label"
+              style={{ color: "#b3b3b3" }}
+            >
               Password
             </label>
             <input
-              name="password"
               id="password"
               placeholder="Enter Password"
               type={showPassword ? "text" : "password"}
               className="form-control"
               required
               value={password}
+              style={{
+                borderRadius: "8px",
+                border: "none",
+                padding: "10px",
+                backgroundColor: "#282828",
+                color: "white",
+              }}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setPassword(e.target.value)
               }
@@ -232,26 +173,39 @@ const SignUpPage = () => {
               className="btn position-absolute top-50 end-0 translate-middle-y"
               style={{
                 border: "none",
-                position: "relative",
-                bottom: "35px",
-                fontSize: 18,
+                background: "transparent",
+                fontSize: "16px",
+                color: "#1db954",
+                cursor: "pointer",
               }}
             >
-              {showPassword ? "**" : "👁️"}
+              {showPassword ? "Hide" : "Show"}
             </button>
           </div>
+
+          {/* Confirm Password */}
           <div className="mb-3 position-relative">
-            <label htmlFor="confirmPassword" className="form-label">
+            <label
+              htmlFor="confirmPassword"
+              className="form-label"
+              style={{ color: "#b3b3b3" }}
+            >
               Confirm Password
             </label>
             <input
-              name="confirmPassword"
               id="confirmPassword"
               placeholder="Confirm Password"
               type={showConfirmPassword ? "text" : "password"}
               className="form-control"
               required
               value={confirmPassword}
+              style={{
+                borderRadius: "8px",
+                border: "none",
+                padding: "10px",
+                backgroundColor: "#282828",
+                color: "white",
+              }}
               onChange={(e: ChangeEvent<HTMLInputElement>) =>
                 setConfirmPassword(e.target.value)
               }
@@ -262,47 +216,46 @@ const SignUpPage = () => {
               className="btn position-absolute top-50 end-0 translate-middle-y"
               style={{
                 border: "none",
-                position: "relative",
-                bottom: "35px",
-                fontSize: 18,
+                background: "transparent",
+                fontSize: "16px",
+                color: "#1db954",
+                cursor: "pointer",
               }}
             >
-              {showConfirmPassword ? "**" : "👁️"}
+              {showConfirmPassword ? "Hide" : "Show"}
             </button>
           </div>
 
-          {confirmEmail && (
-            <div className="mb-3">
-              <label htmlFor="confirmEmailCode" className="form-label">
-                Confirm Email Code
-              </label>
-              <input
-                name="confirmEmailCode"
-                id="confirmEmailCode"
-                placeholder="Enter confirmEmailCode"
-                type="text"
-                className="form-control"
-                required
-                value={emailVerifictionCode}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  setEmailVerificationCode(e.target.value);
-                }}
-              />
-            </div>
-          )}
+          {/* Error Message */}
+          {errorMessage && <p className="text-danger">{errorMessage}</p>}
 
-          {errorMessage == "" ? (
-            <></>
-          ) : (
-            <p style={{ color: "red" }}>{errorMessage}</p>
-          )}
-
-          <button type="submit" className="btn btn-primary w-100">
-            {confirmEmail ? "Sign Up" : "Get Permission"}
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className="btn w-100"
+            style={{
+              backgroundColor: "#1db954",
+              color: "white",
+              fontWeight: "bold",
+              borderRadius: "8px",
+              padding: "10px",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            Sign Up
           </button>
+
+          {/* Redirect to Sign In */}
           <div className="mt-3 text-center">
-            <small>
-              Do you have an account? <a href="/SignIn">Sign In</a>
+            <small style={{ color: "#b3b3b3" }}>
+              Already have an account?{" "}
+              <a
+                href="/SignIn"
+                style={{ color: "#1db954", textDecoration: "none" }}
+              >
+                Sign In
+              </a>
             </small>
           </div>
         </form>

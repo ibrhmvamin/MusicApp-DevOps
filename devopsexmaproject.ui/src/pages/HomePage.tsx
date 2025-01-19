@@ -181,8 +181,8 @@ const HomePage = () => {
     menuItems.forEach((itemId) => {
       const menuItem = document.getElementById(itemId) as HTMLElement;
       if (menuItem) {
-        menuItem.style.color = "black";
-        menuItem.style.backgroundColor = "white";
+        menuItem.style.color = "white";
+        menuItem.style.backgroundColor = "#121212";
       }
     });
 
@@ -190,8 +190,8 @@ const HomePage = () => {
       `menuItem${selectedName}`
     ) as HTMLElement;
     if (selectedMenuItem) {
-      selectedMenuItem.style.color = "white";
-      selectedMenuItem.style.backgroundColor = "#007bff";
+      selectedMenuItem.style.color = "#121212";
+      selectedMenuItem.style.backgroundColor = "#1DB954";
     }
 
     try {
@@ -382,14 +382,18 @@ const HomePage = () => {
     handleAddMp3();
   };
   return (
-    <div className="container-fluid">
-      <div className="row" style={{ height: "100vh" }}>
+    <div style={{ backgroundColor: "#121212" }} className="container-fluid">
+      <div
+        className="row"
+        style={{ height: "100vh", backgroundColor: "#121212" }}
+      >
         <div
           className="col-md-3 col-lg-2"
           style={{
             position: "fixed",
             top: 0,
             left: 0,
+            backgroundColor: "#121212",
             height: "100vh",
             overflowY: "auto",
             display: "flex",
@@ -401,10 +405,14 @@ const HomePage = () => {
           }}
         >
           <div className="card shadow-lg">
-            <div className="card-body" style={{ width: 400 }}>
+            <div
+              className="card-body"
+              style={{ width: 400, backgroundColor: "#121212" }}
+            >
               <h3
                 className="text-center"
                 style={{
+                  color: "#1DB954",
                   position: "relative",
                   display: "flex",
                   justifyContent: "center",
@@ -418,31 +426,10 @@ const HomePage = () => {
 
               <nav className="nav flex-column">
                 <a
-                  id="menuItemPopular"
-                  className="nav-link"
-                  style={{
-                    color: "white",
-                    backgroundColor: "#007bff",
-                    padding: 10,
-                    fontSize: 20,
-                    display: "flex",
-                    justifyContent: "center",
-                    borderRadius: 5,
-                    width: "50%",
-                    cursor: "pointer",
-                  }}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    selectMenuFunction("Popular");
-                  }}
-                >
-                  Popular
-                </a>
-                <a
                   id="menuItemFavorites"
                   className="nav-link"
                   style={{
-                    color: "black",
+                    color: "#1DB954",
                     padding: 10,
                     fontSize: 20,
                     display: "flex",
@@ -462,7 +449,7 @@ const HomePage = () => {
                   id="menuItemMyMp3"
                   className="nav-link"
                   style={{
-                    color: "black",
+                    color: "#1DB954",
                     padding: 10,
                     fontSize: 20,
                     display: "flex",
@@ -483,7 +470,8 @@ const HomePage = () => {
                   className="nav-link"
                   href="#"
                   style={{
-                    color: "black",
+                    color: "#1DB954",
+                    backgroundColor: "#121212",
                     padding: 10,
                     fontSize: 20,
                     display: "flex",
@@ -544,201 +532,114 @@ const HomePage = () => {
         >
           <div
             style={{
-              position: "fixed",
-              top: 0,
-              left: 225.8,
-              zIndex: 2,
-              marginTop: 15,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "20px",
+              padding: "30px",
+              backgroundColor: "#121212",
+              color: "white",
             }}
           >
-            <form
-              style={{
-                display: "flex",
-                justifyContent: "start",
-                alignItems: "center",
-                padding: 10,
-
-                gap: 10,
-              }}
-              onSubmit={handleSearchMp3}
-            >
-              <input
-                name="searchMp3Input"
-                id="searchMp3Input"
-                placeholder="Search..."
-                type="text"
-                className="form-control"
-                required
-                style={{ width: 300 }}
-                value={searchMp3Input}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  if (e.target.value.length > 23) {
-                    return;
-                  } else {
-                    setSearchMp3Input(e.target.value);
-                  }
-                }}
-              />
-              <button
-                style={{
-                  borderRadius: 3,
-                  border: "0",
-
-                  padding: "6px 20px",
-                  color: "white",
-                  background: "#0d6efd",
-                  fontWeight: "revert",
-                }}
-                type="submit"
-              >
-                Search
-              </button>
-            </form>
-          </div>
-
-          <div className="row g-4">
             {mp3List.map((mp3) => (
               <div
-                className="col-md-4 col-lg-3"
                 key={mp3.id}
                 style={{
-                  width: "275px",
-                  height: "302.5px",
+                  backgroundColor: "#181818",
+                  borderRadius: "10px",
+                  width: "220px",
+                  padding: "15px",
                   display: "flex",
-                  justifyContent: "center",
+                  flexDirection: "column",
                   alignItems: "center",
-                  position: "relative",
-                  paddingTop: 100,
-
-                  gap: 0,
+                  boxShadow: "0 4px 10px rgba(0, 0, 0, 0.5)",
+                  transition: "transform 0.2s ease",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.05)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
                 }}
               >
+                {/* Favorite Icon */}
                 <div
-                  className="card"
                   style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => addFavoriteMp3Function(mp3.id)}
+                >
+                  <img
+                    src={`./public/heart_${mp3.favorite ? "on" : "off"}.png`}
+                    alt={`heart_${mp3.favorite ? "on" : "off"}`}
+                    style={{ width: "25px", height: "25px" }}
+                  />
+                </div>
+
+                {/* MP3 Image */}
+                <img
+                  src={mp3.imageUrl}
+                  alt={mp3.name}
+                  style={{
+                    width: "100%",
+                    height: "140px",
+                    borderRadius: "5px",
+                    objectFit: "cover",
+                    marginBottom: "10px",
+                  }}
+                />
+
+                {/* MP3 Name */}
+                <h4
+                  style={{
+                    fontSize: "16px",
+                    fontWeight: "bold",
+                    color: "white",
+                    marginBottom: "10px",
+                    textAlign: "center",
                   }}
                 >
-                  <div
-                    className="position-absolute top-0 end-0 m-2"
-                    style={{
-                      cursor: "pointer",
-                      fontSize: "24px",
-                    }}
-                    onClick={() => addFavoriteMp3Function(mp3.id)}
-                  >
-                    <img
-                      src={`./public/heart_${mp3.favorite ? "on" : "off"}.png`}
-                      alt={`heart_${mp3.favorite ? "on" : "off"}`}
-                      style={{ height: 45, width: 45 }}
-                    />
-                  </div>
+                  {mp3.name}
+                </h4>
 
-                  <div
-                    style={{
-                      height: 170,
-                      width: 170,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      position: "relative",
-                      top: 15,
-                    }}
-                  >
-                    <img
-                      src={mp3.imageUrl}
-                      className="card-img-top"
-                      alt={mp3.name}
-                      style={{
-                        padding: "15px 5px",
-                        objectFit: "cover",
-                      }}
-                    />
-                  </div>
+                {/* Like Button */}
+                <button
+                  onClick={() => addLikeMp3Function(mp3.id)}
+                  style={{
+                    backgroundColor: "#1DB954",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "20px",
+                    padding: "10px 15px",
+                    fontWeight: "bold",
+                    cursor: "pointer",
+                    width: "100%",
+                    marginBottom: "10px",
+                    transition: "background-color 0.2s ease",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#18a149";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#1DB954";
+                  }}
+                >
+                  Like Count: {mp3.likeCount}
+                </button>
 
-                  <div className="card-body">
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: 10,
-                      }}
-                    >
-                      <h6
-                        className="card-title"
-                        style={{ width: 100, height: 40 }}
-                      >
-                        {mp3.name}
-                      </h6>
-                      <div>
-                        <button
-                          onClick={() => {
-                            addLikeMp3Function(mp3.id);
-                          }}
-                          style={{
-                            fontSize: 12,
-                            fontWeight: "bold",
-                            position: "relative",
-                            top: 2,
-                            border: "1px solid darkgray",
-                            borderRadius: 3,
-                            height: 25,
-                          }}
-                        >
-                          Like Count: {mp3.likeCount}
-                        </button>
-                        <p
-                          style={{
-                            color: "#0d6efd",
-                            fontSize: 10,
-                            cursor: "pointer",
-                            position: "relative",
-                            top: 10,
-                            left: 12,
-                          }}
-                          onClick={() => {
-                            setSelectedMp3Id(mp3.id);
-                            setSelectedMp3Name(mp3.name);
-                            const commentMp3Input = document.getElementById(
-                              "commentMp3Input"
-                            ) as HTMLInputElement;
-                            const commentMp3Button = document.getElementById(
-                              "commentMp3Button"
-                            ) as HTMLButtonElement;
-
-                            commentMp3Input.disabled = false;
-                            commentMp3Button.disabled = false;
-                            getComments(mp3.id);
-                          }}
-                        >
-                          Comments {">>"}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                      }}
-                    >
-                      <audio
-                        controls
-                        className=""
-                        style={{
-                          width: "350px",
-                          height: "50px",
-                          transform: "scale(0.6)",
-                        }}
-                      >
-                        <source src={mp3.soundUrl} type="audio/mpeg" />
-                      </audio>
-                    </div>
-                  </div>
-                </div>
+                {/* Audio Player */}
+                <audio
+                  controls
+                  style={{
+                    width: "100%",
+                    marginTop: "10px",
+                  }}
+                >
+                  <source src={mp3.soundUrl} type="audio/mpeg" />
+                </audio>
               </div>
             ))}
           </div>
@@ -750,13 +651,17 @@ const HomePage = () => {
             position: "fixed",
             top: 0,
             right: 0,
+            backgroundColor: "#1DB954",
             height: "100vh",
             padding: 0,
             width: "48vh",
           }}
         >
-          <div className="card shadow-lg p-4">
-            <h3 className="mb-4 text-center" style={{}}>
+          <div
+            style={{ backgroundColor: "#121212" }}
+            className="card shadow-lg p-4"
+          >
+            <h3 className="mb-4 text-center" style={{ color: "#1DB954" }}>
               Add MP3
             </h3>
             <form
@@ -766,7 +671,11 @@ const HomePage = () => {
               }}
             >
               <div className="mb-3">
-                <label htmlFor="mp3Name" className="form-label">
+                <label
+                  htmlFor="mp3Name"
+                  style={{ color: "#1DB954" }}
+                  className="form-label"
+                >
                   MP3 Name
                 </label>
                 <input
@@ -792,7 +701,11 @@ const HomePage = () => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="mp3Image" className="form-label">
+                <label
+                  style={{ color: "#1DB954" }}
+                  htmlFor="mp3Image"
+                  className="form-label"
+                >
                   MP3 Image
                 </label>
                 <input
@@ -824,7 +737,11 @@ const HomePage = () => {
               </div>
 
               <div className="mb-3">
-                <label htmlFor="mp3Sound" className="form-label">
+                <label
+                  style={{ color: "#1DB954" }}
+                  htmlFor="mp3Sound"
+                  className="form-label"
+                >
                   MP3 Sound
                 </label>
                 <input
@@ -860,7 +777,11 @@ const HomePage = () => {
                 <p style={{ color: "red" }}>{errorAddMp3Message}</p>
               )}
 
-              <button type="submit" className="btn btn-primary w-100">
+              <button
+                style={{ backgroundColor: "#1DB954" }}
+                type="submit"
+                className="btn w-100"
+              >
                 Add MP3
               </button>
             </form>
@@ -878,10 +799,6 @@ const HomePage = () => {
               top: 400,
             }}
           >
-            <h3 style={{ marginBottom: "10px", color: "Black" }}>Comments</h3>
-            <p>
-              {">>"} {selectedMp3Name} {"<<"}
-            </p>
             <div
               style={{
                 maxHeight: "230px",

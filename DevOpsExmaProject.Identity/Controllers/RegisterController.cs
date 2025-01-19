@@ -34,7 +34,7 @@ namespace DevOpsExmaProject.Identity.Controllers
      
 
         [HttpPost("signin")]
-        public async Task<IActionResult> SignIn(SignInDto dto)
+        public async Task<IActionResult> SignIn([FromBody] SignInDto dto)
         {
             User user = await _userService.GetAsync(u => u.Email == dto.Email && u.UserName == dto.UserName);
 
@@ -67,7 +67,7 @@ namespace DevOpsExmaProject.Identity.Controllers
         }
 
         [HttpPost("signup")]
-        public async Task<IActionResult> SignUp(SignUpDto dto)
+        public async Task<IActionResult> SignUp([FromBody] SignUpDto dto)
         {
             User user = new()
             {
@@ -91,10 +91,6 @@ namespace DevOpsExmaProject.Identity.Controllers
         [HttpGet("checkEmail")]
         public async Task<IActionResult> CheckEmail(string Email)
         {
-            if (await _userService.GetAsync(u => u.Email == Email) == null)
-            {
-                return Ok("false");
-            }
             return Ok("true");
         }
 
